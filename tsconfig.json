@@ -1,0 +1,11 @@
+// tsconfig.json
+{
+    "extends": "@tsconfig/node20/tsconfig.json", // community base
+    "compilerOptions": {
+      "module": "NodeNext",
+      "declaration": true,
+      "outDir": "dist"
+    },
+    "include": ["src/**/*"]
+  }
+  
