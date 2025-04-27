@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { Kotemari } from '../src/kotemari';
 import fs from 'fs';
 import path from 'path';
@@ -12,6 +12,11 @@ function setupFiles() {
 }
 function cleanupFiles() {
   if (fs.existsSync(tmpDir)) {
+    // デバッグ: 削除前に中身を表示
+    const files = fs.readdirSync(tmpDir);
+    if (files.length > 0) {
+      console.log('[DEBUG] 削除前のtmp_ctx_project内容:', files);
+    }
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }
 }
@@ -20,6 +25,9 @@ describe('Kotemari getContext', () => {
   beforeEach(() => {
     cleanupFiles();
     setupFiles();
+  });
+  afterEach(() => {
+    cleanupFiles();
   });
 
   it('指定ファイルの内容＋依存ファイルの内容を連結した文脈文字列を返す', async () => {

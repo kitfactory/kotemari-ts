@@ -11,10 +11,12 @@ export interface KotemariOptions {
   configPath?: string;
   useCache?: boolean;
   logLevel?: "silent" | "error" | "warn" | "info" | "debug";
+  maxContextLength?: number;
 }
 
 export interface KotemariConfig {
   exclude?: string[];
+  maxContextLength?: number;
 }
 
 import * as chokidar from "chokidar";
@@ -32,6 +34,7 @@ export class Kotemari {
   configPath?: string;
   useCache: boolean;
   logLevel: "silent" | "error" | "warn" | "info" | "debug";
+  maxContextLength?: number;
   private _files: FileInfo[] = [];
   private _dependencies: Record<string, string[]> = {};
   private _reverseDependencies: Record<string, string[]> = {};
@@ -45,6 +48,14 @@ export class Kotemari {
     this.useCache = options.useCache ?? true;
     this.logLevel = options.logLevel ?? "warn";
     this.loadConfig();
+    // maxContextLength: オプション優先、なければ設定ファイルから
+    if (typeof options.maxContextLength === 'number') {
+      this.maxContextLength = options.maxContextLength;
+    } else if (typeof this._config.maxContextLength === 'number') {
+      this.maxContextLength = this._config.maxContextLength;
+    } else {
+      this.maxContextLength = undefined;
+    }
   }
 
   private loadConfig() {
@@ -185,6 +196,10 @@ export class Kotemari {
       }
       return content;
     };
-    return gather(file);
+    let ctx = gather(file);
+    if (typeof this.maxContextLength === 'number' && ctx.length > this.maxContextLength) {
+      ctx = ctx.slice(0, this.maxContextLength);
+    }
+    return ctx;
   }
 }
