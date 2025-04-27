@@ -28,5 +28,9 @@
     "semantic-release": "^24.2.3",
     "typedoc": "^0.28.3",
     "vitest": "^3.1.2"
+  },
+  "dependencies": {
+    "chokidar": "^4.0.3",
+    "yaml": "^2.7.1"
   }
 }

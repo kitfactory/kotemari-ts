@@ -11,8 +11,8 @@
 ## 2. コア機能の設計
 - [x] Python版のクラス・関数構成をTypeScriptにマッピング
 - [x] ファイル依存関係解析ロジックの設計（Python→TypeScript: import解析→import/export解析）
-- [ ] 設定ファイル（.kotemari.yml等）の読み込み設計
-- [ ] キャッシュ・ウォッチ機能の設計
+- [x] 設定ファイル（.kotemari.yml等）の読み込み設計
+- [x] キャッシュ・ウォッチ機能の設計
 - [x] **主要APIとしてREADME.mdに記載されている下記メソッドは必ずTypeScriptユーザーに提供すること：**
     - [x] Kotemari（クラス/コンストラクタ）
     - [x] analyzeProject（analyze_project）
@@ -20,8 +20,8 @@
     - [x] getDependencies（get_dependencies）
     - [x] getReverseDependencies（get_reverse_dependencies）
     - [ ] getContext（get_context）
-    - [ ] startWatching / stopWatching（start_watching / stop_watching）
-    - [ ] clearCache（clear_cache）
+    - [x] startWatching / stopWatching（start_watching / stop_watching）
+    - [x] clearCache（clear_cache）
 
 ## 3. 実装（テスト駆動で進める）
 - [ ] Kotemariクラスの実装
