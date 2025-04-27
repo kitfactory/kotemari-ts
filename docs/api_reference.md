@@ -10,6 +10,8 @@ new Kotemari(options: KotemariOptions)
 - `configPath?: string` … 設定ファイルパス（省略可）
 - `useCache?: boolean` … キャッシュ利用（デフォルトtrue）
 - `logLevel?: "silent" | "error" | "warn" | "info" | "debug"` … ログ出力レベル
+- `maxContextLength?: number` … 文脈最大長（文字数、未指定時はmode等で決定）
+- `mode?: string` … 利用モード（'localLLM', 'cloudLLM' など。localLLMは4000字、cloudLLMは8000字がデフォルト）
 
 ### analyzeProject()
 ```
@@ -42,6 +44,7 @@ async getContext(file: string): Promise<string>
 ```
 - 指定ファイル＋依存ファイル内容を連結した文脈文字列を返します。
 - 存在しない場合は空文字列
+- `maxContextLength` で指定された最大長を超えないように優先順位制御（呼び出し元→依存ファイル順）でトリミングされます。
 
 ### startWatching()
 ```
@@ -61,6 +64,12 @@ saveCache(cacheFilePath: string): void
 ```
 - 解析結果をキャッシュファイルに保存します。
 
+### generateContextCacheKey()
+```
+generateContextCacheKey(file: string): string
+```
+- 指定ファイルの文脈内容・依存・maxContextLength・モード等をまとめてハッシュ化したキャッシュキーを返します。
+
 ### clearCache()
 ```
 clearCache(): void
@@ -71,7 +80,7 @@ clearCache(): void
 
 ## 型定義
 - `FileInfo`: `{ path: string }`
-- `KotemariOptions`: `{ projectRoot: string; configPath?: string; useCache?: boolean; logLevel?: ... }`
+- `KotemariOptions`: `{ projectRoot: string; configPath?: string; useCache?: boolean; logLevel?: string; maxContextLength?: number; mode?: string }`
 - `KotemariConfig`: `{ exclude?: string[] }`
 
 ---

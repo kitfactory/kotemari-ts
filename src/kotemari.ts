@@ -12,6 +12,7 @@ export interface KotemariOptions {
   useCache?: boolean;
   logLevel?: "silent" | "error" | "warn" | "info" | "debug";
   maxContextLength?: number;
+  mode?: string; // 'localLLM' | 'cloudLLM' など
 }
 
 export interface KotemariConfig {
@@ -50,9 +51,17 @@ export class Kotemari {
     this.useCache = options.useCache ?? true;
     this.logLevel = options.logLevel ?? "warn";
     this.loadConfig();
-    // maxContextLength: オプション優先、なければ設定ファイルから
+    // maxContextLength: オプション優先、なければmode/設定ファイルから
     if (typeof options.maxContextLength === 'number') {
       this.maxContextLength = options.maxContextLength;
+    } else if (typeof options.mode === 'string') {
+      if (options.mode === 'localLLM') {
+        this.maxContextLength = 4000;
+      } else if (options.mode === 'cloudLLM') {
+        this.maxContextLength = 8000;
+      } else {
+        this.maxContextLength = undefined;
+      }
     } else if (typeof this._config.maxContextLength === 'number') {
       this.maxContextLength = this._config.maxContextLength;
     } else {
