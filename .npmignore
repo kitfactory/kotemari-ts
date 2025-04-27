@@ -1,0 +1,14 @@
+# Exclude test, examples, docs, config, and other non-essential files from npm package
+
+test/
+examples/
+docs/
+.git/
+.gitignore
+pnpm-lock.yaml
+tsconfig.json
+tsup.config.ts
+vitest.config.js
+eslint.config.js
+todo.md
+README_ja.md
