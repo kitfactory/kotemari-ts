@@ -24,6 +24,8 @@ import { shellDependencyAnalyzer } from "./dependency/ShellDependencyAnalyzer";
 import { goDependencyAnalyzer } from "./dependency/GoDependencyAnalyzer";
 import { rubyDependencyAnalyzer } from "./dependency/RubyDependencyAnalyzer";
 import { IDependencyAnalyzer } from "./dependency/IDependencyAnalyzer";
+import { cDependencyAnalyzer } from "./dependency/CDependencyAnalyzer";
+import { objectiveCDependencyAnalyzer } from "./dependency/ObjectiveCDependencyAnalyzer";
 
 export class Kotemari {
   projectRoot: string;
@@ -61,21 +63,41 @@ export class Kotemari {
     ".sh": shellDependencyAnalyzer,
     ".go": goDependencyAnalyzer,
     ".rb": rubyDependencyAnalyzer,
+    ".c": cDependencyAnalyzer,
+    ".cpp": cDependencyAnalyzer,
+    ".h": cDependencyAnalyzer,
+    ".hpp": cDependencyAnalyzer,
+    ".m": objectiveCDependencyAnalyzer,
+    ".mm": objectiveCDependencyAnalyzer
   };
+
 
   async analyzeProject(): Promise<void> {
     // 対応拡張子ごとにファイルをグループ化し、各アナライザーで解析
+    const fileSet = new Set<string>();
     const allFiles: { path: string }[] = [];
     const allDependencies: Record<string, string[]> = {};
     const allReverseDependencies: Record<string, string[]> = {};
     const exclude = this._config.exclude ?? [];
     for (const [ext, analyzer] of Object.entries(this.analyzers)) {
       const { files, dependencies, reverseDependencies } = analyzer.analyze(this.projectRoot, exclude);
-      allFiles.push(...files);
-      Object.assign(allDependencies, dependencies);
+      for (const f of files) {
+        if (!fileSet.has(f.path)) {
+          fileSet.add(f.path);
+          allFiles.push(f);
+        }
+      }
+      for (const [k, v] of Object.entries(dependencies)) {
+        if (!allDependencies[k]) allDependencies[k] = [];
+        for (const dep of v) {
+          if (!allDependencies[k].includes(dep)) allDependencies[k].push(dep);
+        }
+      }
       for (const [k, v] of Object.entries(reverseDependencies)) {
         if (!allReverseDependencies[k]) allReverseDependencies[k] = [];
-        allReverseDependencies[k].push(...v);
+        for (const dep of v) {
+          if (!allReverseDependencies[k].includes(dep)) allReverseDependencies[k].push(dep);
+        }
       }
     }
     this._files = allFiles;
