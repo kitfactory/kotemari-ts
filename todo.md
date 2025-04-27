@@ -3,22 +3,22 @@
 このToDoリストは、Python製kotemariライブラリをTypeScriptに移植するための作業手順です。
 
 ## 1. 準備
-- [ ] Python版kotemariリポジトリの仕様・構造を理解する
-- [ ] 主要API・機能の洗い出し
-- [ ] TypeScriptプロジェクト（kotemari-ts）をセットアップ
-- [ ] 必要な依存パッケージの選定・導入
+- [x] Python版kotemariリポジトリの仕様・構造を理解する
+- [x] 主要API・機能の洗い出し
+- [x] TypeScriptプロジェクト（kotemari-ts）をセットアップ
+- [x] 必要な依存パッケージの選定・導入
 
 ## 2. コア機能の設計
-- [ ] Python版のクラス・関数構成をTypeScriptにマッピング
-- [ ] ファイル依存関係解析ロジックの設計（Python→TypeScript: import解析→import/export解析）
+- [x] Python版のクラス・関数構成をTypeScriptにマッピング
+- [x] ファイル依存関係解析ロジックの設計（Python→TypeScript: import解析→import/export解析）
 - [ ] 設定ファイル（.kotemari.yml等）の読み込み設計
 - [ ] キャッシュ・ウォッチ機能の設計
-- [ ] **主要APIとしてREADME.mdに記載されている下記メソッドは必ずTypeScriptユーザーに提供すること：**
-    - [ ] Kotemari（クラス/コンストラクタ）
-    - [ ] analyzeProject（analyze_project）
-    - [ ] listFiles（list_files）
-    - [ ] getDependencies（get_dependencies）
-    - [ ] getReverseDependencies（get_reverse_dependencies）
+- [x] **主要APIとしてREADME.mdに記載されている下記メソッドは必ずTypeScriptユーザーに提供すること：**
+    - [x] Kotemari（クラス/コンストラクタ）
+    - [x] analyzeProject（analyze_project）
+    - [x] listFiles（list_files）
+    - [x] getDependencies（get_dependencies）
+    - [x] getReverseDependencies（get_reverse_dependencies）
     - [ ] getContext（get_context）
     - [ ] startWatching / stopWatching（start_watching / stop_watching）
     - [ ] clearCache（clear_cache）
