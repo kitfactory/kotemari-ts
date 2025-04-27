@@ -6,13 +6,23 @@ export interface FileInfo {
   path: string;
 }
 
+export type ContextOptimizationMode = 'aggressive' | 'balanced' | 'conservative';
+
 export interface KotemariOptions {
   projectRoot: string;
   configPath?: string;
   useCache?: boolean;
   logLevel?: "silent" | "error" | "warn" | "info" | "debug";
+  /**
+   * maxContextLength: The base context length (default: 128*1024)
+   * mode: Multiplies maxContextLength by a coefficient:
+   *   - 'aggressive': 0.8
+   *   - 'balanced': 0.4
+   *   - 'conservative': 0.2
+   *   - undefined: 1.0
+   */
   maxContextLength?: number;
-  mode?: string; // 'localLLM' | 'cloudLLM' など
+  mode?: ContextOptimizationMode;
 }
 
 export interface KotemariConfig {
@@ -51,22 +61,23 @@ export class Kotemari {
     this.useCache = options.useCache ?? true;
     this.logLevel = options.logLevel ?? "warn";
     this.loadConfig();
-    // maxContextLength: オプション優先、なければmode/設定ファイルから
-    if (typeof options.maxContextLength === 'number') {
-      this.maxContextLength = options.maxContextLength;
-    } else if (typeof options.mode === 'string') {
-      if (options.mode === 'localLLM') {
-        this.maxContextLength = 4000;
-      } else if (options.mode === 'cloudLLM') {
-        this.maxContextLength = 8000;
-      } else {
-        this.maxContextLength = undefined;
-      }
-    } else if (typeof this._config.maxContextLength === 'number') {
-      this.maxContextLength = this._config.maxContextLength;
-    } else {
-      this.maxContextLength = undefined;
+
+    // 1. maxContextLengthの決定
+    let baseLength =
+      typeof options.maxContextLength === 'number'
+        ? options.maxContextLength
+        : typeof this._config.maxContextLength === 'number'
+          ? this._config.maxContextLength
+          : 128 * 1024;
+
+    // 2. modeによる係数
+    let coeff = 1.0;
+    switch (options.mode) {
+      case 'aggressive': coeff = 0.8; break;
+      case 'balanced': coeff = 0.4; break;
+      case 'conservative': coeff = 0.2; break;
     }
+    this.maxContextLength = Math.floor(baseLength * coeff);
   }
 
   private loadConfig() {
@@ -205,7 +216,8 @@ export class Kotemari {
       let used = Math.min(content.length, remain);
       let result = content.slice(0, used);
       remain -= used;
-      const deps = this.getDependencies(f);
+      let deps = this.getDependencies(f);
+      deps = Array.from(new Set(deps)).sort();
       for (const dep of deps) {
         if (remain <= 0) break;
         // 改行もカウント
@@ -233,7 +245,8 @@ export class Kotemari {
         if (fs.existsSync(filePath)) {
           content = fs.readFileSync(filePath, 'utf8');
         }
-        const deps = this.getDependencies(f);
+        let deps = this.getDependencies(f);
+        deps = Array.from(new Set(deps)).sort();
         for (const dep of deps) {
           content += '\n' + gather(dep);
         }
@@ -253,7 +266,8 @@ export class Kotemari {
       if (visited.has(f)) return [];
       visited.add(f);
       let files = [f];
-      const deps = this.getDependencies(f);
+      let deps = this.getDependencies(f);
+      deps = Array.from(new Set(deps)).sort();
       for (const dep of deps) {
         files = files.concat(gatherDeps(dep));
       }
