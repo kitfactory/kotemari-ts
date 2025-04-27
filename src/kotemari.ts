@@ -29,6 +29,8 @@ import { IDependencyAnalyzer } from "./dependency/IDependencyAnalyzer";
 import { cDependencyAnalyzer } from "./dependency/CDependencyAnalyzer";
 import { objectiveCDependencyAnalyzer } from "./dependency/ObjectiveCDependencyAnalyzer";
 
+import crypto from "crypto";
+
 export class Kotemari {
   projectRoot: string;
   configPath?: string;
@@ -231,4 +233,42 @@ export class Kotemari {
       return gather(file);
     }
   }
+
+  /**
+   * 文脈キャッシュキー生成: 依存ファイル・内容・maxContextLength・ファイル名をまとめてハッシュ化
+   */
+  generateContextCacheKey(file: string): string {
+    // 依存ファイルをたどる
+    const visited = new Set<string>();
+    const gatherDeps = (f: string): string[] => {
+      if (visited.has(f)) return [];
+      visited.add(f);
+      let files = [f];
+      const deps = this.getDependencies(f);
+      for (const dep of deps) {
+        files = files.concat(gatherDeps(dep));
+      }
+      return files;
+    };
+    const depFiles = gatherDeps(file);
+    // 各ファイル内容
+    const contents = depFiles.map(f => {
+      const filePath = path.join(this.projectRoot, f);
+      if (fs.existsSync(filePath)) {
+        return fs.readFileSync(filePath, 'utf8');
+      } else {
+        return '';
+      }
+    });
+    // キャッシュキー: ファイル名リスト, 各内容, maxContextLength
+    const keyObj = {
+      files: depFiles,
+      contents,
+      maxContextLength: this.maxContextLength,
+      target: file,
+    };
+    const keyStr = JSON.stringify(keyObj);
+    return crypto.createHash('sha256').update(keyStr).digest('hex');
+  }
 }
+
