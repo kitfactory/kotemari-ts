@@ -19,6 +19,10 @@ export interface KotemariConfig {
 
 import * as chokidar from "chokidar";
 import { typeScriptDependencyAnalyzer } from "./dependency/TypeScriptDependencyAnalyzer";
+import { pythonDependencyAnalyzer } from "./dependency/PythonDependencyAnalyzer";
+import { shellDependencyAnalyzer } from "./dependency/ShellDependencyAnalyzer";
+import { goDependencyAnalyzer } from "./dependency/GoDependencyAnalyzer";
+import { rubyDependencyAnalyzer } from "./dependency/RubyDependencyAnalyzer";
 import { IDependencyAnalyzer } from "./dependency/IDependencyAnalyzer";
 
 export class Kotemari {
@@ -51,18 +55,32 @@ export class Kotemari {
     }
   }
 
-  private analyzer: IDependencyAnalyzer = typeScriptDependencyAnalyzer;
+  private analyzers: { [ext: string]: IDependencyAnalyzer } = {
+    ".ts": typeScriptDependencyAnalyzer,
+    ".py": pythonDependencyAnalyzer,
+    ".sh": shellDependencyAnalyzer,
+    ".go": goDependencyAnalyzer,
+    ".rb": rubyDependencyAnalyzer,
+  };
 
   async analyzeProject(): Promise<void> {
-    // 今後の多言語対応のため、拡張子ごとにアナライザーを切り替える設計に備える
-    // 現状はTypeScriptのみ対応
-    const { files, dependencies, reverseDependencies } = this.analyzer.analyze(
-      this.projectRoot,
-      this._config.exclude ?? []
-    );
-    this._files = files;
-    this._dependencies = dependencies;
-    this._reverseDependencies = reverseDependencies;
+    // 対応拡張子ごとにファイルをグループ化し、各アナライザーで解析
+    const allFiles: { path: string }[] = [];
+    const allDependencies: Record<string, string[]> = {};
+    const allReverseDependencies: Record<string, string[]> = {};
+    const exclude = this._config.exclude ?? [];
+    for (const [ext, analyzer] of Object.entries(this.analyzers)) {
+      const { files, dependencies, reverseDependencies } = analyzer.analyze(this.projectRoot, exclude);
+      allFiles.push(...files);
+      Object.assign(allDependencies, dependencies);
+      for (const [k, v] of Object.entries(reverseDependencies)) {
+        if (!allReverseDependencies[k]) allReverseDependencies[k] = [];
+        allReverseDependencies[k].push(...v);
+      }
+    }
+    this._files = allFiles;
+    this._dependencies = allDependencies;
+    this._reverseDependencies = allReverseDependencies;
   }
 
   listFiles(): FileInfo[] {
