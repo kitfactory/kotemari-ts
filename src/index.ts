@@ -1,3 +1,1 @@
-export function hello(): string {
-  return "Hello, kotemari-ts!";
-}
+export { Kotemari, KotemariOptions, ContextOptimizationMode, FileInfo } from './kotemari';

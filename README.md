@@ -4,7 +4,20 @@
 
 # kotemari-ts
 
+[![npm version](https://img.shields.io/npm/v/kotemari-ts.svg)](https://www.npmjs.com/package/kotemari-ts)
+[![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](./LICENSE)
+
 A magical context management library for LLM applications, written in TypeScript.
+
+## Installation
+
+```sh
+npm install kotemari-ts
+# or
+yarn add kotemari-ts
+# or
+pnpm add kotemari-ts
+```
 
 ## Overview
 
@@ -36,6 +49,15 @@ These features make kotemari-ts an essential companion for LLM-based code tools,
 ---
 
 ## Main API (Usage Examples)
+
+---
+
+## Changelog
+See [CHANGELOG.md](./CHANGELOG.md) for release notes.
+
+## License
+This project is licensed under the terms of the [MIT License](./LICENSE).
+
 
 
 ## 主なAPI

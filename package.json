@@ -1,8 +1,41 @@
 {
   "name": "kotemari-ts",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "A magical context management library for LLM applications, written in TypeScript.",
+  "keywords": [
+    "LLM",
+    "context",
+    "dependency",
+    "typescript",
+    "code analysis",
+    "prompt",
+    "AI",
+    "codebase"
+  ],
+  "author": "kitfactory <info@kitfactory.dev>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kitfactory/kotemari-ts.git"
+  },
+  "homepage": "https://github.com/kitfactory/kotemari-ts#readme",
+  "bugs": {
+    "url": "https://github.com/kitfactory/kotemari-ts/issues"
+  },
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src",
+    "README.md",
+    "README_ja.md",
+    "LICENSE",
+    "docs/"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "dev": "tsx src/index.ts",
     "build": "tsup",
@@ -11,9 +44,6 @@
     "test": "vitest",
     "docs": "typedoc"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "packageManager": "pnpm@10.9.0",
   "devDependencies": {
     "@commitlint/cli": "^19.8.0",
@@ -28,6 +58,7 @@
     "husky": "^9.1.7",
     "lint-staged": "^15.5.1",
     "semantic-release": "^24.2.3",
+    "tsup": "^8.4.0",
     "typedoc": "^0.28.3",
     "vitest": "^3.1.2"
   },
