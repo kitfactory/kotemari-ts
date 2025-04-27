@@ -126,4 +126,28 @@ export class Kotemari {
   protected async _invokeAnalyzeProject() {
     await this.analyzeProject();
   }
+
+  /**
+   * 指定ファイルとその依存ファイルの内容を連結した文脈文字列を返す
+   * @param file 対象ファイル名
+   */
+  async getContext(file: string): Promise<string> {
+    if (!this._files.find(f => f.path === file)) return '';
+    const visited = new Set<string>();
+    const gather = (f: string): string => {
+      if (visited.has(f)) return '';
+      visited.add(f);
+      const filePath = path.join(this.projectRoot, f);
+      let content = '';
+      if (fs.existsSync(filePath)) {
+        content = fs.readFileSync(filePath, 'utf8');
+      }
+      const deps = this.getDependencies(f);
+      for (const dep of deps) {
+        content += '\n' + gather(dep);
+      }
+      return content;
+    };
+    return gather(file);
+  }
 }
