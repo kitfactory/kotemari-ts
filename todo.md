@@ -35,11 +35,18 @@
     - [x] startWatching / stopWatching（start_watching / stop_watching）
     - [x] clearCache（clear_cache）
 
+## 2.5. 多言語依存関係解析リファクタリング
+- [ ] 依存関係解析インターフェース（例: IDependencyAnalyzer）の定義
+- [ ] TypeScript依存関係解析ロジックを専用クラス（例: TypeScriptDependencyAnalyzer）として分離
+- [ ] analyzersディレクトリに各言語ごとの解析クラスを配置
+- [ ] Kotemari本体はファイル拡張子ごとに適切なアナライザーを選択して利用する設計に変更
+- [ ] 既存テストがすべてパスすることを確認
+
 ## 3. 実装（テスト駆動で進める）
 - [ ] 多言語対応依存関係解析
-    - [ ] TypeScript依存関係解析クラスの実装
-    - [ ] TypeScript依存関係解析クラスのテスト実装
-    - [ ] TypeScript依存関係解析クラスのテストがパスすることを確認
+    - [x] TypeScript依存関係解析クラスの実装
+    - [x] TypeScript依存関係解析クラスのテスト実装
+    - [x] TypeScript依存関係解析クラスのテストがパスすることを確認
     - [ ] Python依存関係解析クラスの実装
     - [ ] Python依存関係解析クラスのテスト実装
     - [ ] Python依存関係解析クラスのテストがパスすることを確認

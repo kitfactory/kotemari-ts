@@ -4,7 +4,7 @@ import fs from 'fs';
 import path from 'path';
 
 // テスト用に一時ディレクトリとファイルを作成
-const tmpDir = path.join(__dirname, 'tmp_project');
+const tmpDir = path.join(__dirname, 'tmp_project_analyze');
 const fileA = path.join(tmpDir, 'a.ts');
 const fileB = path.join(tmpDir, 'b.ts');
 
@@ -14,9 +14,7 @@ function setupFiles() {
   fs.writeFileSync(fileB, "export const B = 2;");
 }
 function cleanupFiles() {
-  if (fs.existsSync(fileA)) fs.unlinkSync(fileA);
-  if (fs.existsSync(fileB)) fs.unlinkSync(fileB);
-  if (fs.existsSync(tmpDir)) fs.rmdirSync(tmpDir);
+  if (fs.existsSync(tmpDir)) fs.rmSync(tmpDir, { recursive: true, force: true });
 }
 
 describe('Kotemari.analyzeProject', () => {

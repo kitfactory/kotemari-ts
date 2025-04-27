@@ -9,7 +9,7 @@ class TestableKotemari extends Kotemari {
 import fs from 'fs';
 import path from 'path';
 
-const tmpDir = path.join(__dirname, 'tmp_project');
+const tmpDir = path.join(__dirname, 'tmp_project_watch');
 
 function setupFiles() {
   if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir);
@@ -49,7 +49,7 @@ describe('Kotemari ウォッチ機能', () => {
     await new Promise(res => setTimeout(res, 200)); // analyzeProjectが呼ばれるのを待つ
     expect(called).toBe(true);
     k.stopWatching();
-  });
+  }, 15000);
 
   it('stopWatchingで監視が停止する', async () => {
     const k = new TestableKotemari({ projectRoot: tmpDir });

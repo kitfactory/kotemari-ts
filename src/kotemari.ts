@@ -17,7 +17,8 @@ export interface KotemariConfig {
   exclude?: string[];
 }
 
-import chokidar from "chokidar";
+import * as chokidar from "chokidar";
+import { TypeScriptDependencyAnalyzer } from "./dependency/TypeScriptDependencyAnalyzer";
 
 export class Kotemari {
   projectRoot: string;
@@ -29,7 +30,7 @@ export class Kotemari {
   private _reverseDependencies: Record<string, string[]> = {};
   private _config: KotemariConfig = {};
   private _cacheFilePath?: string;
-  private _watcher?: chokidar.FSWatcher;
+  private _watcher?: import("chokidar").FSWatcher;
 
   constructor(options: KotemariOptions) {
     this.projectRoot = options.projectRoot;
@@ -50,22 +51,13 @@ export class Kotemari {
   }
 
   async analyzeProject(): Promise<void> {
-    let files = fs.readdirSync(this.projectRoot).filter(f => f.endsWith('.ts'));
-    if (this._config.exclude) {
-      files = files.filter(f => !this._config.exclude!.includes(f));
-    }
-    this._files = files.map(f => ({ path: f }));
-    this._dependencies = {};
-    this._reverseDependencies = {};
-    for (const file of files) {
-      const content = fs.readFileSync(path.join(this.projectRoot, file), 'utf8');
-      const deps = Array.from(content.matchAll(/import .* from ['"]\.\/([\w\-]+)\.?[\w]*['"]/g)).map(m => m[1] + '.ts');
-      this._dependencies[file] = deps;
-      for (const dep of deps) {
-        if (!this._reverseDependencies[dep]) this._reverseDependencies[dep] = [];
-        this._reverseDependencies[dep].push(file);
-      }
-    }
+    const { files, dependencies, reverseDependencies } = TypeScriptDependencyAnalyzer.analyze(
+      this.projectRoot,
+      this._config.exclude ?? []
+    );
+    this._files = files;
+    this._dependencies = dependencies;
+    this._reverseDependencies = reverseDependencies;
   }
 
   listFiles(): FileInfo[] {

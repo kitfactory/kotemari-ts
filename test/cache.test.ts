@@ -3,7 +3,7 @@ import { Kotemari } from '../src/kotemari';
 import fs from 'fs';
 import path from 'path';
 
-const tmpDir = path.join(__dirname, 'tmp_project');
+const tmpDir = path.join(__dirname, 'tmp_project_cache');
 const cacheFile = path.join(tmpDir, '.kotemari.cache.json');
 
 function setupFiles() {
@@ -12,7 +12,7 @@ function setupFiles() {
 }
 function cleanupFiles() {
   if (fs.existsSync(tmpDir)) {
-    fs.rmdirSync(tmpDir, { recursive: true });
+    fs.rmSync(tmpDir, { recursive: true, force: true });
   }
 }
 
