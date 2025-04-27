@@ -182,24 +182,53 @@ export class Kotemari {
   async getContext(file: string): Promise<string> {
     if (!this._files.find(f => f.path === file)) return '';
     const visited = new Set<string>();
-    const gather = (f: string): string => {
-      if (visited.has(f)) return '';
+    // 優先順位制御: 呼び出し元→依存ファイルの順でmaxContextLengthを超えない範囲で連結
+    const gatherWithLimit = (f: string, remain: number): {text: string, used: number} => {
+      if (visited.has(f) || remain <= 0) return { text: '', used: 0 };
       visited.add(f);
       const filePath = path.join(this.projectRoot, f);
       let content = '';
       if (fs.existsSync(filePath)) {
         content = fs.readFileSync(filePath, 'utf8');
       }
+      let used = Math.min(content.length, remain);
+      let result = content.slice(0, used);
+      remain -= used;
       const deps = this.getDependencies(f);
       for (const dep of deps) {
-        content += '\n' + gather(dep);
+        if (remain <= 0) break;
+        // 改行もカウント
+        const newlineLen = 1;
+        if (remain <= newlineLen) break;
+        const depResult = gatherWithLimit(dep, remain - newlineLen);
+        if (depResult.text) {
+          // 改行+依存テキスト全体が入る場合のみ追加
+          result += '\n' + depResult.text;
+          used += newlineLen + depResult.used;
+          remain -= newlineLen + depResult.used;
+        }
       }
-      return content;
+      return { text: result, used };
     };
-    let ctx = gather(file);
-    if (typeof this.maxContextLength === 'number' && ctx.length > this.maxContextLength) {
-      ctx = ctx.slice(0, this.maxContextLength);
+    if (typeof this.maxContextLength === 'number') {
+      return gatherWithLimit(file, this.maxContextLength).text;
+    } else {
+      // 制限なしの場合は従来通り
+      const gather = (f: string): string => {
+        if (visited.has(f)) return '';
+        visited.add(f);
+        const filePath = path.join(this.projectRoot, f);
+        let content = '';
+        if (fs.existsSync(filePath)) {
+          content = fs.readFileSync(filePath, 'utf8');
+        }
+        const deps = this.getDependencies(f);
+        for (const dep of deps) {
+          content += '\n' + gather(dep);
+        }
+        return content;
+      };
+      return gather(file);
     }
-    return ctx;
   }
 }
