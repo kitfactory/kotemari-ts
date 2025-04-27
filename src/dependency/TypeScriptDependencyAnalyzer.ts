@@ -1,12 +1,10 @@
 import fs from 'fs';
 import path from 'path';
 
-export class TypeScriptDependencyAnalyzer {
-  static analyze(projectRoot: string, exclude: string[] = []): {
-    files: { path: string }[],
-    dependencies: Record<string, string[]>,
-    reverseDependencies: Record<string, string[]>,
-  } {
+import { IDependencyAnalyzer } from './IDependencyAnalyzer';
+
+export class TypeScriptDependencyAnalyzer implements IDependencyAnalyzer {
+  analyze(projectRoot: string, exclude: string[] = []) {
     let files = fs.readdirSync(projectRoot).filter(f => f.endsWith('.ts'));
     if (exclude.length > 0) {
       files = files.filter(f => !exclude.includes(f));
@@ -26,3 +24,5 @@ export class TypeScriptDependencyAnalyzer {
     return { files: fileInfos, dependencies, reverseDependencies };
   }
 }
+
+export const typeScriptDependencyAnalyzer = new TypeScriptDependencyAnalyzer();

@@ -18,7 +18,8 @@ export interface KotemariConfig {
 }
 
 import * as chokidar from "chokidar";
-import { TypeScriptDependencyAnalyzer } from "./dependency/TypeScriptDependencyAnalyzer";
+import { typeScriptDependencyAnalyzer } from "./dependency/TypeScriptDependencyAnalyzer";
+import { IDependencyAnalyzer } from "./dependency/IDependencyAnalyzer";
 
 export class Kotemari {
   projectRoot: string;
@@ -50,8 +51,12 @@ export class Kotemari {
     }
   }
 
+  private analyzer: IDependencyAnalyzer = typeScriptDependencyAnalyzer;
+
   async analyzeProject(): Promise<void> {
-    const { files, dependencies, reverseDependencies } = TypeScriptDependencyAnalyzer.analyze(
+    // 今後の多言語対応のため、拡張子ごとにアナライザーを切り替える設計に備える
+    // 現状はTypeScriptのみ対応
+    const { files, dependencies, reverseDependencies } = this.analyzer.analyze(
       this.projectRoot,
       this._config.exclude ?? []
     );
